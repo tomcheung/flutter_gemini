@@ -42,12 +42,41 @@ class ChatNotifier extends _$ChatNotifier {
   }
 
   Future<Exception?> sendMessage(String message, {XFile? image}) async {
-    /** TODO: Complete this function
-     * 1. Read the existing state
-     * 2. Check it contain image, switch to 'gemini-pro-vision'
-     * 3. Sent content: TextPart, DataPart('image/jpeg') for image to gemini
-     * 4. Update the state
-     */
-    return Future.value(null);
+    final newContent = List.of(state.contents);
+    newContent.add(Message(fromUser: true, text: message, image: image));
+
+    final switchToVision = image != null && !state.haveImage;
+
+    if (switchToVision) {
+      final model = ref.read(getGeminiModelProvider('gemini-pro-vision'));
+      final history = state.session.history.toList();
+      state = ChatState(
+          session: model.startChat(history: history), contents: newContent);
+    } else {
+      state = ChatState(session: state.session, contents: newContent);
+    }
+
+    Content prompt;
+    if (image != null) {
+      final path = File(image.path);
+      final bytes = await path.readAsBytes();
+      // available data part
+      // https://ai.google.dev/api/rest/v1/Content?_gl=1*17y64re*_up*MQ..*_ga*NjYzNTQyMjYxLjE3MTE4MTU2MDQ.*_ga_P1DBVKWT6V*MTcxMTgxNTYwNC4xLjAuMTcxMTgxNzM0NS4wLjAuMA..#part
+      prompt =
+          Content.multi([TextPart(message), DataPart('image/jpeg', bytes)]);
+    } else {
+      prompt = Content.text(message);
+    }
+
+    try {
+      final response = await state.session.sendMessage(prompt);
+      newContent.add(Message(fromUser: false, text: response.text));
+
+      state = ChatState(session: state.session, contents: newContent);
+      return null;
+    } on GenerativeAIException catch (ex) {
+      d.log(ex.toString(), error: ex);
+      return ex;
+    }
   }
 }
