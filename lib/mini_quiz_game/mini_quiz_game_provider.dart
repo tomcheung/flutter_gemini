@@ -49,8 +49,19 @@ class Question {
 
 @Riverpod(keepAlive: true)
 Future<List<Question>> getQuizQuestions(GetQuizQuestionsRef ref) async {
-  // TODO: Fetch question from Gemini
-  return [];
+  final model = ref.read(getGeminiModelProvider('gemini-1.0-pro'));
+
+  final prompt = [Content.text(_promptBody2)];
+  final response = await model.generateContent(prompt);
+  final responseText = response.text?.replaceAll('```', '');
+  if (responseText == null) {
+    return [];
+  }
+
+  d.log(responseText);
+
+  List<dynamic> json = jsonDecode(responseText);
+  return json.indexed.map((e) => Question.fromJson(e.$1, e.$2)).toList();
 }
 
 sealed class QuizState {}
@@ -82,10 +93,27 @@ class QuizNotifier extends _$QuizNotifier {
   }
 
   void startQuiz() async {
-   // TODO: Completed quiz logic
+    ref.invalidate(getQuizQuestionsProvider);
+    final questions = await ref.watch(getQuizQuestionsProvider.future);
+    state = QuizInProgressState(currentQuestion: questions.first, answers: []);
   }
 
   void answerQuestion(String answer) {
-    // TODO: Completed quiz logic
+    final answerState = state as QuizInProgressState;
+    final newAnswer = List.of(answerState.answers);
+
+    if (!answerState.currentQuestion.options.contains(answer)) {
+      d.log('answer did not found in options');
+    }
+    newAnswer.add(answer);
+
+    final questions = ref.read(getQuizQuestionsProvider).value ?? [];
+    final index = questions.indexOf(answerState.currentQuestion);
+
+    if (index + 1 < questions.length) {
+      state = QuizInProgressState(currentQuestion: questions[index + 1], answers: newAnswer);
+    } else {
+      state = QuizFinishState(answers: newAnswer, questions: questions);
+    }
   }
 }
