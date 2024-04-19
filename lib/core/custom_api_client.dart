@@ -1,5 +1,4 @@
 import 'package:http/http.dart';
-import '../main.dart';
 
 class CustomHttpClient extends BaseClient {
   final _client = Client();

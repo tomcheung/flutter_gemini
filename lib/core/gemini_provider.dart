@@ -10,16 +10,20 @@ const apiKey = String.fromEnvironment("API_KEY");
 const customServer = String.fromEnvironment("CUSTOM_SERVER");
 
 @Riverpod(keepAlive: true)
-GenerativeModel getGeminiModel(GetGeminiModelRef ref, String model) {
+GenerativeModel getGeminiModel(GetGeminiModelRef ref, String model,
+    {List<Tool>? tools}) {
   // Enable this proxy is you don't have VPN
   CustomHttpClient? customClient;
   if (customServer.isNotEmpty) {
     customClient = CustomHttpClient(overrideHost: customServer);
   }
 
+  // https://github.com/google/generative-ai-js/issues/66
   return GenerativeModel(
     model: model,
     apiKey: apiKey,
     httpClient: customClient,
+    tools: tools,
+    requestOptions: const RequestOptions(apiVersion: 'v1beta'),
   );
 }

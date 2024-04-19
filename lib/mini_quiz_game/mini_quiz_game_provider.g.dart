@@ -6,7 +6,7 @@ part of 'mini_quiz_game_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getQuizQuestionsHash() => r'd30e30ee8c33c3ed3e7ee9a28e3c0cde35387a17';
+String _$getQuizQuestionsHash() => r'db7e5008182c5350f28e71cfec82ed0597653c88';
 
 /// See also [getQuizQuestions].
 @ProviderFor(getQuizQuestions)

@@ -6,7 +6,7 @@ part of 'gemini_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getGeminiModelHash() => r'09232f66a519b273704269fea882d6ad7d39c230';
+String _$getGeminiModelHash() => r'7643cb26dbcbfc54408b0711263ac87126c353b3';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -40,10 +40,12 @@ class GetGeminiModelFamily extends Family<GenerativeModel> {
 
   /// See also [getGeminiModel].
   GetGeminiModelProvider call(
-    String model,
-  ) {
+    String model, {
+    List<Tool>? tools,
+  }) {
     return GetGeminiModelProvider(
       model,
+      tools: tools,
     );
   }
 
@@ -53,6 +55,7 @@ class GetGeminiModelFamily extends Family<GenerativeModel> {
   ) {
     return call(
       provider.model,
+      tools: provider.tools,
     );
   }
 
@@ -75,11 +78,13 @@ class GetGeminiModelFamily extends Family<GenerativeModel> {
 class GetGeminiModelProvider extends Provider<GenerativeModel> {
   /// See also [getGeminiModel].
   GetGeminiModelProvider(
-    String model,
-  ) : this._internal(
+    String model, {
+    List<Tool>? tools,
+  }) : this._internal(
           (ref) => getGeminiModel(
             ref as GetGeminiModelRef,
             model,
+            tools: tools,
           ),
           from: getGeminiModelProvider,
           name: r'getGeminiModelProvider',
@@ -91,6 +96,7 @@ class GetGeminiModelProvider extends Provider<GenerativeModel> {
           allTransitiveDependencies:
               GetGeminiModelFamily._allTransitiveDependencies,
           model: model,
+          tools: tools,
         );
 
   GetGeminiModelProvider._internal(
@@ -101,9 +107,11 @@ class GetGeminiModelProvider extends Provider<GenerativeModel> {
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.model,
+    required this.tools,
   }) : super.internal();
 
   final String model;
+  final List<Tool>? tools;
 
   @override
   Override overrideWith(
@@ -119,6 +127,7 @@ class GetGeminiModelProvider extends Provider<GenerativeModel> {
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         model: model,
+        tools: tools,
       ),
     );
   }
@@ -130,13 +139,16 @@ class GetGeminiModelProvider extends Provider<GenerativeModel> {
 
   @override
   bool operator ==(Object other) {
-    return other is GetGeminiModelProvider && other.model == model;
+    return other is GetGeminiModelProvider &&
+        other.model == model &&
+        other.tools == tools;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, model.hashCode);
+    hash = _SystemHash.combine(hash, tools.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -145,6 +157,9 @@ class GetGeminiModelProvider extends Provider<GenerativeModel> {
 mixin GetGeminiModelRef on ProviderRef<GenerativeModel> {
   /// The parameter `model` of this provider.
   String get model;
+
+  /// The parameter `tools` of this provider.
+  List<Tool>? get tools;
 }
 
 class _GetGeminiModelProviderElement extends ProviderElement<GenerativeModel>
@@ -153,6 +168,8 @@ class _GetGeminiModelProviderElement extends ProviderElement<GenerativeModel>
 
   @override
   String get model => (origin as GetGeminiModelProvider).model;
+  @override
+  List<Tool>? get tools => (origin as GetGeminiModelProvider).tools;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

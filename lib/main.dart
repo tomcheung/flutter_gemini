@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_google_gen_ai/chat/chat.dart';
+import 'package:flutter_google_gen_ai/exchange_price/exchange_price.dart';
 import 'package:flutter_google_gen_ai/mini_quiz_game/mini_quiz_game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum Section { chat, quiz }
+enum Section { chat, quiz, price }
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -71,6 +72,7 @@ class _AppRootState extends State<AppRoot> {
     return switch (selectedSection) {
       Section.chat => const ChatView(),
       Section.quiz => const MiniQuizGame(),
+      Section.price => const ExchangePrice(),
     };
   }
 }
